@@ -12,7 +12,10 @@ I searched the whole repo for `save_to_watchlist` (ripgrep) and confirmed only t
 
 ## Comment 2 — Deduplication
 **What I did:**
+Looked at how `add_to_collection()` in `services/collection_service.py` handles duplicates: it queries for an existing `CollectionEntry` with the same `user_id` + `film_id`, and if one exists it raises `AlreadyInCollectionError` instead of inserting again. I followed that exact pattern in `add_to_watchlist()` — check `WatchlistEntry.query.filter_by(user_id=..., film_id=...).first()`, and if a row is found raise a new `AlreadyInWatchlistError`. The watchlist add route now catches that error and returns HTTP 409 (same status the collection route uses for duplicates).
+
 **How I verified:**
+Compared the new check side-by-side with `add_to_collection()`'s dedup block. Ran `pytest tests/ -v` after the change to confirm the existing suite still passes. (A dedicated duplicate-edge-case test for watchlist comes later as a stretch feature.)
 
 ## Comment 3 — Missing test
 **What I did:**
