@@ -115,3 +115,13 @@ def test_add_to_watchlist_duplicate_raises(app, sample_user, sample_film):
             user_id=sample_user, film_id=sample_film
         ).count()
         assert count == 1
+
+
+def test_add_to_watchlist_respects_public_flag(app, sample_user, sample_film):
+    """Callers can set visibility explicitly via the public parameter."""
+    with app.app_context():
+        entry = add_to_watchlist(
+            user_id=sample_user, film_id=sample_film, public=False
+        )
+        assert entry.public is False
+
