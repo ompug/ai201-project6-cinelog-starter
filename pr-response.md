@@ -70,13 +70,13 @@ Re-added `WatchlistEntry` on top of main's UUID models, with `film_id` as `db.St
 ## Stretch Features
 
 ### `remove_from_watchlist()`
-*(filled after implementation)*
+Implemented `remove_from_watchlist(user_id, film_id)` using the same pattern as `remove_from_collection()`: look up the `WatchlistEntry`, and if it's missing raise `NotInWatchlistError` (mirrored by the DELETE route as HTTP 404). On success the row is deleted and the function returns `True`. Wired up as `DELETE /watchlist/<user_id>/remove` with body `{ "film_id": "<uuid>" }`. Added tests for a successful remove and for the missing-entry case.
 
 ### Second watchlist test
-*(filled after implementation)*
+Added `test_add_to_watchlist_duplicate_raises` beyond the Comment 3 nonexistent-film test. It covers the dedup path from Comment 2 — second add of the same film must raise `AlreadyInWatchlistError` and leave exactly one row. I chose that case because review asked only for the missing-film test, so the duplicate guard would otherwise have no watchlist-side regression coverage even though collection already has the parallel test.
 
 ### Visibility toggle on add
-*(filled after implementation)*
+`add_to_watchlist(user_id, film_id, public=True)` now accepts an explicit `public` argument (default remains `True`, matching Comment 4). The POST `/watchlist/<user_id>/add` route forwards optional `"public"` from the JSON body via `data.get("public", True)`. Callers who want a private save pass `"public": false`; everyone else gets the social default without changing their payload.
 
 ## PR Description
 
