@@ -22,15 +22,19 @@ The app starts on `http://localhost:5000` and uses a local SQLite database (`cin
 ```
 ai201-project6-cinelog-starter/
 ├── app.py                     # Flask app factory
-├── models.py                  # SQLAlchemy models
+├── models.py                  # SQLAlchemy models (including WatchlistEntry)
 ├── services/
-│   └── collection_service.py  # Business logic for collections
+│   ├── collection_service.py  # Business logic for collections
+│   └── watchlist_service.py   # Business logic for watchlists
 ├── routes/
 │   ├── films.py               # Film browsing endpoints
-│   └── collection.py          # Collection endpoints
+│   ├── collection.py          # Collection endpoints
+│   └── watchlist/             # Watchlist endpoints
 ├── tests/
-│   └── test_collection.py     # Tests for collection service
+│   ├── test_collection.py     # Tests for collection service
+│   └── test_watchlist.py      # Tests for watchlist service
 ├── CONTRIBUTING.md            # Commit conventions and PR guidelines
+├── pr-response.md             # Review responses for the watchlist PR
 └── requirements.txt
 ```
 
@@ -53,6 +57,14 @@ ai201-project6-cinelog-starter/
 | POST | `/collection/<user_id>/add` | Add a film to the collection |
 | DELETE | `/collection/<user_id>/remove` | Remove a film from the collection |
 
+### Watchlist
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/watchlist/<user_id>` | Get a user's watchlist (newest first) |
+| POST | `/watchlist/<user_id>/add` | Add a film (`film_id` required; optional `public`) |
+| DELETE | `/watchlist/<user_id>/remove` | Remove a film from the watchlist |
+
 ---
 
 ## Data Models
@@ -62,6 +74,8 @@ ai201-project6-cinelog-starter/
 **User** — A registered user. IDs are UUIDs.
 
 **CollectionEntry** — Links a user to a film they've watched. Stores rating and date added. A user can only have one entry per film.
+
+**WatchlistEntry** — Links a user to a film they want to watch later. Stores date added and a `public` visibility flag (defaults to `true`).
 
 ---
 
