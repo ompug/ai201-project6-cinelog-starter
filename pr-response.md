@@ -46,8 +46,13 @@ I agree with the maintainer that most users want to see what they added recently
 
 ## Comment 6 — Rebase
 **What conflicted:**
+After rebasing `feature/watchlist` onto updated `main`, the UUID film-ID refactor from main replaced `models.py`. The watchlist model lived only on the pre-refactor branch tip (`WatchlistEntry.film_id` as an integer FK), so it disappeared from `models.py` while `services/watchlist_service.py` still described `film_id` as an int. That left the watchlist code broken against main's UUID `Film.id`.
+
 **How I resolved it:**
+Re-added `WatchlistEntry` on top of main's UUID models, with `film_id` as `db.String(36)` FK to `film.id` (same shape as `CollectionEntry`). Updated the service/route docs to treat `film_id` as a UUID string instead of an int.
+
 **How I verified no conflict remains:**
+`git rebase origin/main` completed with a linear history (no merge commits in `git log --oneline`). Ran `pytest tests/ -v` after the UUID update — all collection + watchlist tests pass. Confirmed `models.WatchlistEntry.film_id` is a string UUID column matching `Film.id`.
 
 ## PR Description
 <!-- Written at the end — feature overview, design decisions, manual testing steps -->
