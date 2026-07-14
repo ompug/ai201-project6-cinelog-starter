@@ -92,3 +92,26 @@ def test_remove_from_watchlist_missing_raises(app, sample_user, sample_film):
     with app.app_context():
         with pytest.raises(NotInWatchlistError):
             remove_from_watchlist(user_id=sample_user, film_id=sample_film)
+
+
+# ── Deduplication (stretch edge case) ────────────────────────────────────────
+
+def test_add_to_watchlist_duplicate_raises(app, sample_user, sample_film):
+    """
+    Adding the same film twice should raise AlreadyInWatchlistError,
+    not silently create a duplicate entry.
+
+    Chosen because Comment 3 only covered nonexistent film_id; this locks in
+    the Comment 2 dedup behavior the same way test_add_to_collection_duplicate_raises
+    does for collections.
+    """
+    with app.app_context():
+        add_to_watchlist(user_id=sample_user, film_id=sample_film)
+
+        with pytest.raises(AlreadyInWatchlistError):
+            add_to_watchlist(user_id=sample_user, film_id=sample_film)
+
+        count = WatchlistEntry.query.filter_by(
+            user_id=sample_user, film_id=sample_film
+        ).count()
+        assert count == 1
